@@ -91,6 +91,7 @@ class CHandle (object) :
         self.size-=1
         return self.l_processes.pop(index)
 
+'''
 p1 = CProcess(0,"p1",0,15,2)
 p2 = CProcess(1,"p2",1,10,0)
 p1.get_burst_time()
@@ -100,6 +101,7 @@ c1.add_process(p2)
 print(c1.get_highest_priority())
 c1.remove_process(0)
 print(c1.get_size())
+'''
 
 class cell (object) :
     def __init__ (self,process_name,begin,end):
@@ -125,9 +127,10 @@ class cell (object) :
     def get_end (self):
         return self.end
     
- 
+'''
 cell1 = cell("p1",0,5)
 print(cell1.get_begin())
+'''
 
 class simulator (object) :
    
@@ -159,16 +162,45 @@ class simulator (object) :
         self.size_cells-=1
         return self.l_cells.pop(0)
     
-    def simulate (self) :
+    def simulate (self):
         start = 0 
         if(self.algorithm_name=="First Come First Served"):
             for i in range(0,self.size_processes) :
                 current_index = self.l_processes.get_min_arrival_time()
                 process = self.l_processes.remove_process(current_index)
-                c = cell(process.get_process_name(),start,start+process.get_process_burst())
-                start += process.get_process_burst()
+                c = cell(process.get_process_name(),start,start+process.get_burst_time())
+                start += process.get_burst_time()
                 self.l_cells.add_cell(c)
-        #elif(algorithm_name=="Shortest Job First"&&algoritm_type=="non preemptive"):
+        elif(self.algorithm_name =="Shortest Job First") :
+            if(self.algorithm_type =="non preemptive"):
+                while self.size_processes != 0 :
+                    if (start == 0) :
+                        if(self.l_processes[self.l_processes.get_min_burst_time()].get_arrival_time()==self.l_processes[self.l_processes.get_min_arrival_time()].get_arrival_time()):
+                            current_index = self.l_processes.get_min_burst_time()
+                            process = self.l_processes.remove_process(current_index)
+                            c = cell(process.get_process_name(),start,start+process.get_burst_time())
+                            start += process.get_burst_time()
+                            self.l_cells.add_cell(c)
+                        elif(self.l_processes[self.l_processes.get_min_burst_time()].get_arrival_time()>self.l_processes[self.l_processes.get_min_arrival_time()].get_arrival_time()):
+                            current_index = self.l_processes.get_min_arrival_time()
+                            process = self.l_processes.remove_process(current_index)
+                            c = cell(process.get_process_name(),start,start+process.get_burst_time())
+                            start += process.get_burst_time()
+                            self.l_cells.add_cell(c)
+                    else:
+                        if(self.l_processes[self.l_processes.get_min_burst_time()].get_arrival_time()<=self.l_cells[self.size_cells-1].get_end()):
+                            current_index = self.l_processes.get_min_burst_time()
+                            process = self.l_processes.remove_process(current_index)
+                            c = cell(process.get_process_name(),start,start+process.get_burst_time())
+                            start += process.get_burst_time()
+                            self.l_cells.add_cell(c)
+                        else:
+                            current_index = self.l_processes.get_min_arrival_time()
+                            process = self.l_processes.remove_process(current_index)
+                            c = cell(process.get_process_name(),start,start+process.get_burst_time())
+                            start += process.get_burst_time()
+                            self.l_cells.add_cell(c)
+                     
             
             
 
