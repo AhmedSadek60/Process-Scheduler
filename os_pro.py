@@ -274,27 +274,27 @@ class CSimulator(object):
         elif (self.algorithm_name == "Round Robin"):
             while handle.get_size() != 0:
                 for i in handle.size:
-                    if(CHandle.l_processes[i].burst_time > CSimulator.round_robin_duration):
-                        CHandle.l_processes[i].burst_time -=CSimulator.round_robin_duration
-                        c=CCell(CHandle.l_processes[i].get_process_name(), start,
-                                    start + CSimulator.round_robin_duration)
-                        start += CSimulator.round_robin_duration
+                    if(handle.l_processes[i].get_burst_time() > self.round_robin_duration):
+                        handle.l_processes[i].set_burst_time( handle.l_processes[i].get_burst_time() - self.round_robin_duration )
+                        c=CCell(handle.l_processes[i].get_process_name(), start,
+                                    start + self.round_robin_duration)
+                        start += self.round_robin_duration
                         self.add_cell(c)
                     else:
-                        if(CHandle.l_processes[i].burst_time < CSimulator.round_robin_duration):
-                            c = CCell(CHandle.l_processes[i].get_process_name(), start,
-                                      start + CHandle.l_processes[i].get_burst_time())
-                        elif(CHandle.l_processes[i].burst_time == CSimulator.round_robin_duration):
-                            c = CCell(CHandle.l_processes[i].get_process_name(), start,
-                                  start + CSimulator.round_robin_duration)
+                        if(handle.l_processes[i].get_burst_time() < self.round_robin_duration):
+                            c = CCell(handle.l_processes[i].get_process_name(), start,
+                                      start + handle.l_processes[i].get_burst_time())
+                        elif(handle.l_processes[i].get_burst_time() == self.round_robin_duration):
+                            c = CCell(handle.l_processes[i].get_process_name(), start,
+                                  start + self.round_robin_duration)
                         self.add_cell(c)
-                        CHandle.remove_process(CHandle.l_processes[i])
+                        handle.remove_process(handle.l_processes[i])
 
 # test shortest job first "preemptive"
-p1 = CProcess("p1", 0, 8,9)
-p2 = CProcess("p2", 1, 4,3)
-p3 = CProcess("p3", 2, 9,100)
-p4 = CProcess("p4", 3, 5,3)
+p1 = CProcess("p1", 0, 8)
+p2 = CProcess("p2", 1, 4)
+p3 = CProcess("p3", 2, 9)
+p4 = CProcess("p4", 3, 5)
 d = CHandle()
 d.add_process(p1)
 d.add_process(p2)
@@ -303,11 +303,9 @@ d.add_process(p4)
 s = CSimulator("Round Robin", "preemptive")
 print(type(d))
 s.simulate(d)
-print(s.remove_cell())
-print(s.remove_cell())
-print(s.remove_cell())
-print(s.remove_cell())
-print(s.remove_cell())
+for i in range(s.size_cells):
+	print(s.remove_cell())
+
 
 
 
