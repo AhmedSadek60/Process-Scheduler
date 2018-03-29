@@ -268,9 +268,12 @@ no_processes=0
 d = CHandle()
 matrix = []
 s = CSimulator("","")
-
+inside = True
+initial = 0
+final = 0
+average_waiting_time = 0
 import sys
-from PyQt5.QtWidgets import(QApplication,QTabWidget,QTableWidget,QWidgetItem,QMainWindow,QPushButton,QVBoxLayout,QCheckBox,QHBoxLayout,QLabel,QLineEdit,QRadioButton,QWidget)
+from PyQt5.QtWidgets import(QApplication,QTabWidget,QTableWidgetItem,QTableWidget,QWidgetItem,QMainWindow,QPushButton,QVBoxLayout,QCheckBox,QHBoxLayout,QLabel,QLineEdit,QRadioButton,QWidget)
 
             
 class MyTable(QTableWidget):
@@ -294,13 +297,16 @@ class MyTable(QTableWidget):
             l_burst_time.append(int(value))
         else:
             l_priority.append(int(value))
+
 class Window (QWidget):
     
     def __init__ (self):
         super().__init__()
         self.l1 = QLabel("algorithms")
         self.l2 = QLabel("no_processes")
+        self.l3 = QLabel("average waiting time")
         self.le = QLineEdit()
+        self.le2 = QLineEdit()
         self.r1 = QRadioButton("FCFS")
         self.r2 = QRadioButton("RB")
         self.r3 = QRadioButton("SJF NON PREEMPTIVE")
@@ -318,6 +324,7 @@ class Window (QWidget):
         h3 = QHBoxLayout()
         h4 = QHBoxLayout()
         h5 = QHBoxLayout()
+        h6 = QHBoxLayout()
         h3.addWidget(self.l2)
         h3.addStretch()
         h3.addWidget(self.le)
@@ -325,6 +332,9 @@ class Window (QWidget):
         h4.addWidget(self.psh1)
         h4.addStretch()
         h5.addWidget(self.psh2)
+        h6.addWidget(self.l3)
+        h6.addStretch()
+        h6.addWidget(self.le2)
         #h5.addStretch()
         #h5.addWidget(self.psh3)
         v1.addWidget(self.l1)
@@ -336,6 +346,7 @@ class Window (QWidget):
         v1.addWidget(self.r6)
         v1.addLayout(h3)
         v1.addLayout(h4)
+        v1.addLayout(h6)
         v1.addLayout(h5)
         self.psh1.clicked.connect(self.btn1_click) 
         self.psh2.clicked.connect(self.btn2_click) 
@@ -344,9 +355,14 @@ class Window (QWidget):
         
         
     def btn1_click (self):
-        self.form_widget = MyTable(int(self.le.text()), 4)
-        col_headers = ['process name', 'arrival time', 'burst time', 'priority']
-        self.form_widget.setHorizontalHeaderLabels(col_headers)
+        if self.r5.isChecked() and self.r6.isChecked():
+            self.form_widget = MyTable(int(self.le.text()), 4)
+            col_headers = ['process name', 'arrival time', 'burst time', 'priority']
+            self.form_widget.setHorizontalHeaderLabels(col_headers)
+        else:
+            self.form_widget = MyTable(int(self.le.text()), 3)
+            col_headers = ['process name', 'arrival time', 'burst time']
+            self.form_widget.setHorizontalHeaderLabels(col_headers)
         global no_processes,algorithm_name
         no_processes=int(self.le.text())
         if(self.r1.isChecked()):
@@ -374,26 +390,35 @@ class Window (QWidget):
             matrix = [l_process_name,l_arrival_time,l_burst_time]
             for i in range(len(l_process_name)):
                 d.add_process(CProcess(matrix[0][i],matrix[1][i],matrix[2][i]))
-            global s
+            global s,initial,final,average_waiting_time,inside
             if algorithm_name=="FCFS":
                 s = CSimulator("First Come First Served", "non preemptive")
                 s.simulate(d)
-                print(s.size_cells)
+                '''
                 for i in range(s.size_cells):
                     print(s.remove_cell())
+                '''
             elif algorithm_name=="SJF NON PREEMPTIVE":
                 s = CSimulator("Shortest Job First", "non preemptive")
                 s.simulate(d)
-                print(s.size_cells)
-                for i in range(s.size_cells):
-                    print(s.remove_cell())   
             elif algorithm_name=="SJF PREEMPTIVE":
                 s = CSimulator("Shortest Job First", "preemptive")
                 s.simulate(d)
-                print(s.size_cells)
-                for i in range(s.size_cells):
-                    print(s.remove_cell())  
+                  
             
+            for i in range(no_processes):
+                    initial = 0
+                    final = 0
+                    for j in range(s.size_cells):
+                       if(l_process_name[i]==s.l_cells[j].get_process_name()):
+                           if(inside):
+                               inside = False
+                               initial = s.l_cells[j].get_begin()
+                               final = s.l_cells[j].get_end()
+                           else:
+                               final = s.l_cells[j].get_end()
+                    average_waiting_time+=(final-l_arrival_time[i]-l_burst_time[i])   
+            self.le2.setText(str(average_waiting_time/no_processes)) 
            
             
            
