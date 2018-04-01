@@ -353,6 +353,7 @@ class CSimulator(object):
                             c = CCell(process.get_process_name(), start, start + process.get_burst_time())
                             start += process.get_burst_time()
                             self.add_cell(c)
+<<<<<<< HEAD
         
             elif (self.algorithm_type == "preemptive"):
                 handle.arrange_arrival_time_highest_priority()
@@ -410,6 +411,33 @@ p2 = CProcess("p2", 0, 1,1)
 p3 = CProcess("p3", 0, 2,4)
 p4 = CProcess("p4", 0, 1,5)
 p5 = CProcess("p5", 0, 5,2)
+=======
+
+        elif (self.algorithm_name == "Round Robin"):
+            while handle.get_size() != 0:
+                for i in handle.size:
+                    if(handle.l_processes[i].get_burst_time() > self.round_robin_duration):
+                        handle.l_processes[i].set_burst_time( handle.l_processes[i].get_burst_time() - self.round_robin_duration )
+                        c=CCell(handle.l_processes[i].get_process_name(), start,
+                                    start + self.round_robin_duration)
+                        start += self.round_robin_duration
+                        self.add_cell(c)
+                    else:
+                        if(handle.l_processes[i].get_burst_time() < self.round_robin_duration):
+                            c = CCell(handle.l_processes[i].get_process_name(), start,
+                                      start + handle.l_processes[i].get_burst_time())
+                        elif(handle.l_processes[i].get_burst_time() == self.round_robin_duration):
+                            c = CCell(handle.l_processes[i].get_process_name(), start,
+                                  start + self.round_robin_duration)
+                        self.add_cell(c)
+                        handle.remove_process(handle.l_processes[i])
+
+# test shortest job first "preemptive"
+p1 = CProcess("p1", 0, 8)
+p2 = CProcess("p2", 1, 4)
+p3 = CProcess("p3", 2, 9)
+p4 = CProcess("p4", 3, 5)
+>>>>>>> origin/AhmedBranch
 d = CHandle()
 d.add_process(p1)
 d.add_process(p2)
